@@ -1,0 +1,9 @@
+x=${1}
+y=${2}
+for ((i=${x}; i<${y}; i++)) do 
+	echo ${i} >> ./server_copy/${i}
+done
+cd server_copy
+git add .
+git commit -m "adding ${1} to ${2}"
+

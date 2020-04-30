@@ -1,0 +1,18 @@
+docker run --name bm_scylla1 -d scylladb/scylla --experimental 1
+
+docker run --name bm_scylla2 -d scylladb/scylla --seeds="$(docker inspect --format='{{ .NetworkSettings.IPAddress }}' bm_scylla1)" --experimental 1
+
+ocamlfind ocamlopt -linkpkg -package lwt -package irmin -package irmin-scylla get.ml -o get_span -cclib -lstdc++ -cclib -lssl -cclib -lcrypto
+
+cqlsh --request-timeout=6000
+
+git log --graph --all --decorate --oneline
+git cat-file -p 
+
+./span.sh -c mix_span -h "172.17.0.2" -r 8020 -n 1 -s 200
+
+./script_set_span.sh -c set_span -h "172.17.0.2" -r 8020 -n 1 -s 200 -f get
+
+size of folder: sudo du -sh input/
+
+~/work/benchmark/input/mix/8020/500_2$ ../../../../input_script/mix/inp_script.sh 128 101 401
