@@ -1,0 +1,1 @@
+select count(*) from irmin_scylla.append_only; truncate irmin_scylla.append_only; truncate irmin_scylla.atomic_write; select count(*) from irmin_scylla.append_only;
