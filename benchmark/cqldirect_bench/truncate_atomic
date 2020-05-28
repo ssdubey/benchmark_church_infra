@@ -1,0 +1,1 @@
+truncate irmin_scylla.atomic_write;

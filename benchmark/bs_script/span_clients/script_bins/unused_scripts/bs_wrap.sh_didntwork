@@ -1,0 +1,13 @@
+#this script was created to automate the bs run of multiple loops for a given no. of clients. It did not work because somehow some keys remains missing after pre. Much time wasted on this.
+input_file_caption=${1}
+
+for((i=0;i<5;i++)) do
+	#cqlsh 51.159.31.34 -f /home/shashank/cmdfile;	
+	cmd="bs_run.sh -n 2 -h 51.159.31.34 -f pre_${input_file_caption}_${i} -o pre -s ${input_file_caption}"
+	echo $cmd
+	./bs_run.sh -n 2 -h 51.159.31.34 -f pre_${input_file_caption}_${i} -o pre -s ${input_file_caption}
+	echo pre_completed
+	#sleep 2
+	#./bs_run.sh -n 2 -h 51.159.31.34 -f post_${input_file_caption}_${i} -o post -s ${input_file_caption}
+	#echo post_completed
+done
