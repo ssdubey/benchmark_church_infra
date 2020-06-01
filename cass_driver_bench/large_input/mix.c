@@ -102,6 +102,9 @@ CassError insert_into_tuple(CassSession * session, int no_of_inputs, int keyleng
 
     for(int loop_count=0; loop_count < no_of_inputs; loop_count++){
 
+// struct timeval overhead_start, overhead_end;
+// gettimeofday(&overhead_start, NULL);
+
       //generating a key 
 
         int i = 0;
@@ -124,6 +127,12 @@ CassError insert_into_tuple(CassSession * session, int no_of_inputs, int keyleng
         }
         value[j] = '\0';
         
+// gettimeofday(&overhead_end, NULL);
+
+// long seconds = (overhead_end.tv_sec - overhead_start.tv_sec);
+// long micros = ((seconds * 1000000) + overhead_end.tv_usec) - (overhead_start.tv_usec);
+// printf("overhead time = %d   %d\n", seconds, micros);
+
         //inserting a key-value pair to db
 
         cass_statement_bind_string(statement, 0, key);

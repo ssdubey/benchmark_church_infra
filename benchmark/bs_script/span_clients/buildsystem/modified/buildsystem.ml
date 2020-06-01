@@ -94,7 +94,8 @@ let refresh repo public_branch_anchor =
     Scylla_kvStore.Branch.list repo >>= fun branchList -> 
     mergeOpr branchList public_branch_anchor repo  (*merge is returning unit*)
 
-let getcontent fileloc =
+(*change getcontent to generate the value instead of taking it from file *)
+(*let getcontent fileloc =
         let buf = Buffer.create 4096 in
 try
         while true do
@@ -105,16 +106,27 @@ try
         assert false
 with
         End_of_file -> Buffer.contents buf
+*)
+
+let rand_chr () = (Char.chr (97 + (Random.int 26)));;
+
+let rec getcontent len str = 
+    if len > 0 then
+        (let str = str ^ (String.make 1 (rand_chr ())) in
+        getcontent (len -1) str)
+    else
+        str 
 
 let createValue lib ip liblistpath =
     let ts = string_of_float (Unix.gettimeofday ()) in 
     
-    let fileContentBuf = getcontent (open_in (liblistpath ^ lib ^ "_data")) in
+    (*let fileContentBuf = getcontent (open_in (liblistpath ^ lib ^ "_data")) in*)
+    let contentBuf = getcontent 128 "" in
         (*let liblist = String.split_on_char('\n') fileContentBuf in
         List.tl (List.rev liblist)*)
 
     (*let libcontent = getcontent liblistpath in *)
-    {artifact = fileContentBuf; metadata = [(ip, ts)]; count = 1}
+    {artifact = contentBuf; metadata = [(ip, ts)]; count = 1}
 
 let updateValue item ip =
 let stime = Unix.gettimeofday() in
@@ -250,6 +262,9 @@ let _ =
         let client = Sys.argv.(2) in
         let libpath = Sys.argv.(3) in
         let libindex = Sys.argv.(4) in 
+
+        Random.init (Unix.getpid ());
+
         (*let ip = "127.0.0.1" in
         let liblistpath = "/home/shashank/work/benchmark_irminscylla/build_system/input/buildsystem/" in
         Buildsystem.buildLibrary ip liblistpath*)

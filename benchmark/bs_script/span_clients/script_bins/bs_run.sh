@@ -22,7 +22,7 @@ then
 	do
 		cmd="time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index > ./output/client_${i}_${output_file}"
 		echo $cmd
-		time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index #> ./output/client_${i}_${output_file}
+		time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index > ./output/client_${i}_${output_file}&
 		#time ./bs 51.159.31.34 client1 /home/shashank/work/benchmark/bs_input/8020/128/5000/pre/ index > ./output/34_5k_o_n_2 &
 	done
 else
@@ -30,7 +30,7 @@ else
 	do
 		cmd="time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index > ./output/client_${i}_${output_file} &"
 		echo $cmd
-		time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index #> ./output/client_${i}_${output_file} &
+		time ./bs_wo_lwt ${hosts} client_${i} /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/${size}_${i}/${order}/ index > ./output/client_${i}_${output_file} &
 		#time ./bs 51.159.31.34 client1 /home/shashank/work/benchmark/bs_input/8020/128/5000/pre/ index > ./output/34_5k_o_n_2 &
 	done
 fi

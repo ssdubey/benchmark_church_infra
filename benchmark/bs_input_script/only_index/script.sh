@@ -21,21 +21,19 @@ mkdir pre
 mkdir post
 
 for ((i=1; i<=${pre_count}; i++)) do
-	ind=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1)
-	pushd post
+	ind=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo ${ind} >> index
-	popd
-	pushd pre
-	echo ${ind} >> index
-	echo $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${value_size} | head -n 1) >> ${ind}_data
-	popd
 done
+
+cp index ./pre/
+mv index ./post/
+
 pushd post
 for ((i=1; i<=${post_count}; i++)) do
 	#pushd post
-	ind=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1)
+	ind=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 	echo ${ind} >> index
-        echo $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${value_size} | head -n 1) >> ${ind}_data
+#        echo $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${value_size} | head -n 1) >> ${ind}_data
 	#popd
 done
 popd
