@@ -1,0 +1,8 @@
+#!/bin/bash
+no_of_clients=${1}
+input_count=${2}
+
+for ((i=1; i<=${no_of_clients}; i++)) 
+do
+./counter 127.0.0.1 ${i} ${input_count}& 
+done
