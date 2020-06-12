@@ -12,6 +12,7 @@ module Counter: Irmin.Contents.S with type t = int64 = struct
         let old = match old with None -> 0L | Some o -> o in
         let (+) = Int64.add and (-) = Int64.sub in 
         (* Printf.printf "  conflict:  %d  a=%d  b=%d  old=%d" !mc (Int64.to_int a) (Int64.to_int b) (Int64.to_int old); *)
+        Printf.printf "  conflict:  %d  " !mc;
         a + b - old
         
         let merge = Irmin.Merge.(option (v t merge))
@@ -47,19 +48,14 @@ let rec mergeOpr branchList currentBranch currentBranch_string repo opr_meta =
                 (* Scylla_kvStore.of_branch repo h >>= fun branch ->  *)
                 Scylla_kvStore.Branch.get repo h >>= fun other_head_cmt ->
                 Scylla_kvStore.of_commit other_head_cmt >>= fun other_head ->
-                (* Scylla_kvStore.Branch.get repo currentBranch_string >>= fun current_head_cmt ->
-                Scylla_kvStore.of_commit current_head_cmt >>= fun current_head -> *)
-
-                    (* ignore @@ mergeBranches branch currentBranch opr_meta; *)
+                
                     ignore @@ mergeBranches other_head currentBranch opr_meta;
-                    (* ignore @@ mergeBranches current_head currentBranch opr_meta; *)
-
+                    
                     mergeOpr t currentBranch currentBranch_string repo opr_meta
                     )
                     else
                     mergeOpr t currentBranch currentBranch_string repo opr_meta
     | _ -> (*print_string "branch list empty";*) 
-    (* mergeBranches currentBranch currentBranch opr_meta fix this *)
         Lwt.return_unit);
         
         Lwt.return_unit
@@ -69,9 +65,9 @@ let mergeOpr_help branchList currentBranch currentBranch_string repo opr_meta =
   Scylla_kvStore.Branch.get repo currentBranch_string >>= fun current_head_cmt ->
   Scylla_kvStore.of_commit current_head_cmt >>= fun current_head ->
 
-  mergeOpr branchList current_head currentBranch_string repo opr_meta;
-
-  mergeBranches current_head currentBranch opr_meta
+  mergeOpr branchList current_head currentBranch_string repo opr_meta
+  ;print_string "\n merging branch now...\n"
+  ;mergeBranches current_head currentBranch opr_meta
 
 let createValue () =
     Int64.of_int (Random.int 10)
@@ -184,18 +180,14 @@ let refresh repo client refresh_meta =
   (* List.iter (fun x -> Printf.printf " *%s " x) branchList; *)
   let branchList = filter_public branchList in
   (* List.iter (fun x -> Printf.printf " ~%s " x) branchList; *)
-
-  (* Scylla_kvStore.Branch.get repo (client ^ "_public") >>= fun current_head_cmt ->
-                Scylla_kvStore.of_commit current_head_cmt >>= fun current_head -> *)
-                
-                mergeOpr_help branchList public_branch_anchor (client ^ "_public") repo refresh_meta  (*merge is returning unit*)
+        
+  mergeOpr_help branchList public_branch_anchor (client ^ "_public") repo refresh_meta  (*merge is returning unit*)
   (* mergeOpr branchList current_head (client ^ "_public") repo refresh_meta; *)
-
   (* mergeBranches current_head public_branch_anchor refresh_meta *)
-  
   (* create_or_get_private_branch repo client >>= fun private_branch_anchor ->
-  mergeBranches public_branch_anchor private_branch_anchor refresh_meta                                                                                                  *)
+  mergeBranches public_branch_anchor private_branch_anchor refresh_meta    *)                                                                                            
 
+(* ------------------squash------------------------------------------------------------------- *)
 
 (* let squash repo private_branch_str old_commit = 
   Scylla_kvStore.Branch.get repo private_branch_str >>= fun other_head_cmt ->
@@ -207,7 +199,7 @@ let refresh repo client refresh_meta =
 
   Scylla_kvStore.of_branch repo private_branch_str >>= fun private_branch_anchor ->
   Scylla_kvStore.Head.set private_branch_anchor new_commit *)
-
+(*------------------squash-------------------------------------------------------------------*)
 
 let post_operate_help opr_load private_branch_anchor repo client total_opr_load flag set_meta get_meta publish_meta refresh_meta old_commit =
   (* Printf.printf "\nPost: client %s:" client; *)
