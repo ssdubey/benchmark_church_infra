@@ -160,14 +160,15 @@ let post_operate_help opr_load private_branch_anchor repo client total_opr_load 
   ignore @@ build write_keylist private_branch_anchor repo client set_meta get_meta "post_write";
 
   ignore @@ build write_keylist private_branch_anchor repo client set_meta get_meta "read";
-  ignore @@ (create_or_get_public_branch repo client >>= fun public_branch_anchor ->
-  ignore @@ publish_to_public repo client publish_meta;
-  
-  ignore @@ build write_keylist public_branch_anchor repo client set_meta get_meta "read";
 
-  ignore @@ refresh repo client refresh_meta;
+  (* ignore @@ (create_or_get_public_branch repo client >>= fun public_branch_anchor -> *)
+  ignore @@ publish_to_public repo client publish_meta
   
-  Lwt.return_unit)
+  (* ignore @@ build write_keylist public_branch_anchor repo client set_meta get_meta "read"; *)
+
+  (* ;ignore @@ refresh repo client refresh_meta; *)
+  
+  (* Lwt.return_unit) *)
   
 
 let rec operate opr_load private_branch_anchor repo client total_opr_load flag done_opr set_meta get_meta publish_meta refresh_meta =
@@ -204,7 +205,7 @@ let buildLibrary ip client total_opr_load set_meta get_meta publish_meta refresh
   let opr_load = 2 in 
   let done_opr = 2 in
   operate opr_load private_branch_anchor repo client total_opr_load true done_opr set_meta get_meta publish_meta refresh_meta;
-  (* ignore @@ refresh repo client refresh_meta; *)
+  ignore @@ refresh repo client refresh_meta;
   Lwt.return_unit 
 
 let _ =
