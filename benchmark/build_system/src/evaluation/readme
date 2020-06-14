@@ -1,0 +1,11 @@
+to run:
+cmd from script: ./bs_run.sh -n 1 -h 51.159.31.34 -f pre_20_1 -o pre -s 20
+transalted to: time ./bs_wo_lwt 51.159.31.34 client_1 /home/shashank/benchmark_church_infra/benchmark/bs_input/8020/128/20_1/pre/ index > ./output/client_1_pre_20_1
+
+copied buildsystem code from github after suspecting code loss from irmin3.
+
+this code generates values itself
+does not do anything if the lib is found in the db
+client is combined
+updates the metadata when the value is found
+merge happens with head method

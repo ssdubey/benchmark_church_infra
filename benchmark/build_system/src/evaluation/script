@@ -1,0 +1,4 @@
+ocamlfind ocamlopt -linkpkg -package lwt -package irmin -package irmin-scylla buildsystem.ml -o bs_wo_lwt -cclib -lstdc++ -cclib -lssl -cclib -lcrypto
+scp bs_wo_lwt root@irmin-3.ocamllabs.io:/home/shashank/benchmark_church_infra/benchmark/bs_script/span_clients/script_bins/
+scp buildsystem.ml root@irmin-3.ocamllabs.io:/home/shashank/benchmark_church_infra/benchmark/bs_script/span_clients/script_bins/
+scp readme root@irmin-3.ocamllabs.io:/home/shashank/benchmark_church_infra/benchmark/bs_script/span_clients/script_bins/
