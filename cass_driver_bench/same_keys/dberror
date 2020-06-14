@@ -1,0 +1,12 @@
+1589729837.759 [ERROR] (cluster_connector.cpp:190:void datastax::internal::core::ClusterConnector::on_connect(datastax::internal::core::ControlConnector*)): Unable to establish a control connection to host 51.159.31.36 because of the following error: Underlying connection error: Received error response 'Invalid or unsupported protocol version (66); supported versions are (3/v3, 4/v4, 5/v5-beta, 65/dse-v1)' (0x0200000A)
+1589729837.759 [WARN] (cluster_connector.cpp:286:void datastax::internal::core::ClusterConnector::on_connect(datastax::internal::core::ControlConnector*)): Host 51.159.31.36 does not support protocol version DSEv2. Trying protocol version DSEv1...
+
+real	0m0.071s
+user	0m0.051s
+sys	0m0.000s
+1589729838.261 [ERROR] (cluster_connector.cpp:190:void datastax::internal::core::ClusterConnector::on_connect(datastax::internal::core::ControlConnector*)): Unable to establish a control connection to host 51.159.31.36 because of the following error: Underlying connection error: Received error response 'Invalid or unsupported protocol version (66); supported versions are (3/v3, 4/v4, 5/v5-beta, 65/dse-v1)' (0x0200000A)
+1589729838.261 [WARN] (cluster_connector.cpp:286:void datastax::internal::core::ClusterConnector::on_connect(datastax::internal::core::ControlConnector*)): Host 51.159.31.36 does not support protocol version DSEv2. Trying protocol version DSEv1...
+
+real	0m0.497s
+user	0m0.210s
+sys	0m0.044s

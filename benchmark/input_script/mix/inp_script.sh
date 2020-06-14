@@ -1,4 +1,4 @@
-size=${1}
+size=${1}   #size is value size for kv store
 set_count=${2}
 get_count=${3}
 

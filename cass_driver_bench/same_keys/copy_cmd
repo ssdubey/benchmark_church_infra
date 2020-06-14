@@ -1,0 +1,1 @@
+copy irmin_scylla.atomic_write (key) to './output.csv';
