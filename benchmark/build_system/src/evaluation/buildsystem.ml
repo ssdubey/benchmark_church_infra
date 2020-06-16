@@ -76,22 +76,22 @@ let readfile fileloc =
     Scylla_kvStore.get public_branch [lib] >>= fun _ ->
     Lwt.return_unit *)
 
-let find_in_db lib private_branch total_time = 
+let find_in_db lib private_branch opr_time = 
     try 
     let stime = Unix.gettimeofday () in 
     Scylla_kvStore.get private_branch [lib] >>= fun _ ->
     let etime = Unix.gettimeofday () in
     (* Printf.printf "\nfind_in_db: %f" (etime -. stime); *)
-    total_time := !total_time +. (etime -. stime);
+    opr_time := !opr_time +. (etime -. stime);
     Lwt.return_true
     with 
     _ -> Lwt.return_false
 
-let mergeBranches outBranch currentBranch total_time = 
+let mergeBranches outBranch currentBranch opr_time = 
     let stime = Unix.gettimeofday () in (*Printf.printf "merging branch";*)
         ignore @@ Scylla_kvStore.merge_into ~info:(fun () -> Irmin.Info.empty) outBranch ~into:currentBranch;
     let etime = Unix.gettimeofday () in
-    total_time := !total_time +. (etime -. stime);
+    opr_time := !opr_time +. (etime -. stime);
     Lwt.return_unit
 
 (* let rec mergeOpr branchList currentBranch repo =
@@ -101,29 +101,29 @@ let mergeBranches outBranch currentBranch total_time =
                 mergeOpr t currentBranch repo 
     | _ -> print_string "branch list empty"; Lwt.return_unit *)
 
-let rec mergeOpr branchList currentBranch currentBranch_string repo total_time = 
+let rec mergeOpr branchList currentBranch currentBranch_string repo opr_time = 
     match branchList with 
     | h::t -> 
             if (currentBranch_string <> h) then (  
                 Scylla_kvStore.Branch.get repo h >>= fun other_head_cmt ->
                 Scylla_kvStore.of_commit other_head_cmt >>= fun other_head ->
                 
-                    ignore @@ mergeBranches other_head currentBranch total_time;
+                    ignore @@ mergeBranches other_head currentBranch opr_time;
                     
-                    mergeOpr t currentBranch currentBranch_string repo total_time
+                    mergeOpr t currentBranch currentBranch_string repo opr_time
                     )
                     else
-                    mergeOpr t currentBranch currentBranch_string repo total_time
+                    mergeOpr t currentBranch currentBranch_string repo opr_time
     | _ -> Lwt.return_unit
 
-let mergeOpr_help branchList currentBranch currentBranch_string repo total_time =
+let mergeOpr_help branchList currentBranch currentBranch_string repo opr_time =
 
     Scylla_kvStore.Branch.get repo currentBranch_string >>= fun current_head_cmt ->
     Scylla_kvStore.of_commit current_head_cmt >>= fun current_head ->
     
-    ignore @@ mergeOpr branchList current_head currentBranch_string repo total_time
-    (* mergeOpr branchList currentBranch currentBranch_string repo total_time *)
-    ;mergeBranches current_head currentBranch total_time
+    ignore @@ mergeOpr branchList current_head currentBranch_string repo opr_time
+    (* mergeOpr branchList currentBranch currentBranch_string repo opr_time *)
+    ;mergeBranches current_head currentBranch opr_time
 
 let filter_str str =
     let split = String.split_on_char '_' str in 
@@ -148,14 +148,14 @@ let create_or_get_private_branch repo ip =
     Scylla_kvStore.master repo >>= fun b_master ->
     Scylla_kvStore.clone ~src:b_master ~dst:(ip ^ "_private")
     
-let refresh repo client total_time =
+let refresh repo client opr_time =
     (*merge current branch with the detached head of other*) 
     create_or_get_public_branch repo client >>= fun public_branch_anchor ->
     Scylla_kvStore.Branch.list repo >>= fun branchList -> 
     
     let branchList = filter_public branchList in
             
-    mergeOpr_help branchList public_branch_anchor (client ^ "_public") repo total_time (*merge is returning unit*)
+    mergeOpr_help branchList public_branch_anchor (client ^ "_public") repo opr_time (*merge is returning unit*)
         
 (*change getcontent to generate the value instead of taking it from file *)
 (*let getcontent fileloc =
@@ -202,10 +202,10 @@ let _ = etime -. stime in
     {artifact = item.artifact; metadata = metadata; count = count}
 
 
-let rec build liblist private_branch_anchor cbranch_string repo ip liblistpath total_time = (*cbranch_string as in current branch is only used for putting string in db*)
+let rec build liblist private_branch_anchor cbranch_string repo ip liblistpath opr_time = (*cbranch_string as in current branch is only used for putting string in db*)
     match liblist with 
     | lib :: libls -> 
-        find_in_db lib private_branch_anchor total_time >>= fun boolval -> 
+        find_in_db lib private_branch_anchor opr_time >>= fun boolval -> 
             (match boolval with 
             | false -> (let v = createValue lib ip liblistpath in
                         let stime = Unix.gettimeofday() in
@@ -217,7 +217,7 @@ let rec build liblist private_branch_anchor cbranch_string repo ip liblistpath t
                         let diff = etime -. stime in
                         (* print_string "\ntime taken in inserting one key = ";  *)
 (* Printf.printf "\nfalse_setting: %f" diff; *)
-total_time := !total_time +. diff;
+opr_time := !opr_time +. diff;
 )
                         (*print_float (diff);*)
 
@@ -236,7 +236,7 @@ total_time := !total_time +. diff;
                         let etime = Unix.gettimeofday() in
                         let diff2 = etime -. stime in
                         (* Printf.printf "\ntrue_getting: %f" diff2;  *)
-                        total_time := !total_time +. diff2;
+                        opr_time := !opr_time +. diff2;
                         Lwt.return_unit)
                         );
 (* (diff1 +. diff2)) in *)
@@ -247,7 +247,7 @@ total_time := !total_time +. diff;
                         printdetails "new data" lib item;
                         Lwt.return_unit);                                      *)
 
-        build libls private_branch_anchor cbranch_string repo ip liblistpath total_time;
+        build libls private_branch_anchor cbranch_string repo ip liblistpath opr_time;
 
     | [] -> Lwt.return_unit
 
@@ -262,19 +262,19 @@ let testfun public_branch_anchor lib msg =
                         printdetails msg lib item;
     Lwt.return_unit
 
-let publish branch1 branch2 total_time = (*changes of branch2 will merge into branch1*)
+let publish branch1 branch2 opr_time = (*changes of branch2 will merge into branch1*)
     (* Irmin_scylla.gc_meta_fun branch2; branch2 is a string and the branch which is sending its changes. make sure this is alwyas private. *)
     let stime = Unix.gettimeofday() in
         ignore @@ Scylla_kvStore.merge_with_branch ~info:(fun () -> Irmin.Info.empty) branch1 branch2;
     let etime = Unix.gettimeofday() in
     let diff = etime -. stime in
-    total_time := !total_time +. diff
+    opr_time := !opr_time +. diff
 
 (*publishing the changes*)
-let publish_to_public repo ip total_time =
+let publish_to_public repo ip opr_time =
     create_or_get_public_branch repo ip >>= fun public_branch_anchor ->
     (*changes of 2nd arg branch will merge into first*)
-    ignore @@ publish public_branch_anchor (ip ^ "_private") total_time;
+    ignore @@ publish public_branch_anchor (ip ^ "_private") opr_time;
     Lwt.return_unit 
 
 (* let rec resolve_lwt lst = *)
@@ -297,7 +297,7 @@ let squash repo private_branch_str public_branch_str =
 updates the public branch. Since I am taking input in such a way that there is 80% read and 20% write for each private branch, refresh over the 
 private branch doesn't seem necessary for benchmark purpose*)
 
-let buildLibrary ip client liblistpath libindex total_time =
+let buildLibrary ip client liblistpath libindex opr_time ref_time publish_time =
     let conf = Irmin_scylla.config ip in
     Scylla_kvStore.Repo.v conf >>= fun repo ->
     (* ignore liblistpath;*)
@@ -305,11 +305,11 @@ let buildLibrary ip client liblistpath libindex total_time =
     
     let liblist = file_to_liblist (liblistpath ^ libindex)in
     
-    ignore @@ build liblist private_branch_anchor (client ^ "_private") repo client liblistpath total_time;
+    ignore @@ build liblist private_branch_anchor (client ^ "_private") repo client liblistpath opr_time;
 
-    ignore @@ publish_to_public repo client total_time;
+    ignore @@ publish_to_public repo client publish_time;
 
-    ignore @@ refresh repo client total_time;
+    ignore @@ refresh repo client ref_time;
     (*ignore @@ squash repo (client ^ "_private") (client ^ "_public");*)
 
     Lwt.return_unit 
@@ -326,10 +326,12 @@ let _ =
         (*let ip = "127.0.0.1" in
         let liblistpath = "/home/shashank/work/benchmark_irminscylla/build_system/input/buildsystem/" in
         Buildsystem.buildLibrary ip liblistpath*)
-        let total_time =  ref 0.0 in 
-        ignore @@ buildLibrary hostip client libpath libindex total_time;
+        let opr_time = ref 0.0 in 
+        let ref_time = ref 0.0 in 
+        let publish_time = ref 0.0 in
+        ignore @@ buildLibrary hostip client libpath libindex opr_time ref_time publish_time;
 
-        Printf.printf "\n%f" !total_time
+        Printf.printf "\n%f;%f;%f" !opr_time !publish_time !ref_time
 
         
     (*In this code private branch takes up all the updates and then push everything to the public brnach. All the functioning at public branch

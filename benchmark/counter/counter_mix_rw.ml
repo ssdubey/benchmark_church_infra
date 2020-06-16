@@ -11,7 +11,7 @@ module Counter: Irmin.Contents.S with type t = int64 = struct
 		old () >|=* fun old ->
         let old = match old with None -> 0L | Some o -> o in
         let (+) = Int64.add and (-) = Int64.sub in 
-        (* Printf.printf "  conflict:  %d  a=%d  b=%d  old=%d" !mc (Int64.to_int a) (Int64.to_int b) (Int64.to_int old); *)
+        Printf.printf "  conflict:  %d  a=%d  b=%d  old=%d" !mc (Int64.to_int a) (Int64.to_int b) (Int64.to_int old);
         a + b - old
         
         let merge = Irmin.Merge.(option (v t merge))
@@ -97,7 +97,7 @@ let rec build liblist private_branch_anchor repo client set_meta get_meta rw = (
             | "post_write" -> (print "post_write build" client;
                         let v = createValue () in
                         let stime = Unix.gettimeofday() in
-                        
+                        Printf.printf "\n-----------------------\nsetting: client: %s, key: %s, value = %d" client lib (Int64.to_int v);
                         ignore @@ Scylla_kvStore.set_exn ~info:(fun () -> Irmin.Info.empty) 
                                                 private_branch_anchor [lib] v;
                         
@@ -120,7 +120,7 @@ let rec build liblist private_branch_anchor repo client set_meta get_meta rw = (
 (*generating key of 2B *)
 let gen_write_key () = 
   let str = [|"1";"2";"3";"4";"5";"6";"7";"8";"9";"0";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";|] in
-  let key = (Array.get str (Random.int 32))^(Array.get str (Random.int 32)) in
+  let key = "33" (*(Array.get str (Random.int 32))^(Array.get str (Random.int 32))*) in
   key
 
 
@@ -219,7 +219,7 @@ let post_operate_help opr_load private_branch_anchor repo client total_opr_load 
 
   ignore @@ build write_keylist private_branch_anchor repo client set_meta get_meta "read";
   ignore @@ (create_or_get_public_branch repo client >>= fun public_branch_anchor ->
-(* Printf.printf " publishing... "; *)
+Printf.printf "\npublishing... ";
   ignore @@ publish_to_public repo client publish_meta;
   
   ignore @@ build write_keylist public_branch_anchor repo client set_meta get_meta "read";
@@ -228,7 +228,7 @@ let post_operate_help opr_load private_branch_anchor repo client total_opr_load 
   ignore (old_commit >>= fun old_commit ->
                   squash repo (client^"_public") old_commit); *)
 
-(* Printf.printf " refreshing... "; *)
+Printf.printf "\nrefreshing... ";
   ignore @@ refresh repo client refresh_meta;
   (* ignore @@ build write_keylist public_branch_anchor repo client set_meta get_meta "read"; *)
   Lwt.return_unit)
@@ -296,7 +296,7 @@ let _ =
   let total_opr_load = Sys.argv.(3) in (* no. of keys to insert *)
   print "beginning" client;
   Random.init (Unix.getpid ());
-
+Printf.printf "use counter branch";
   let set_meta = ref ("", 0.0, 0) in 
   let get_meta = ref ("", 0.0, 0) in 
   (* let merge_meta = ref ("", 0.0, 0) in  *)
