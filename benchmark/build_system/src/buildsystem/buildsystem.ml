@@ -179,16 +179,16 @@ let squash repo private_branch_str public_branch_str =
 let buildLibrary ip liblistpath =
     let conf = Irmin_scylla.config ip in
     Scylla_kvStore.Repo.v conf >>= fun repo ->
-     ignore liblistpath;
-    (* create_or_get_private_branch repo ip >>= fun private_branch_anchor ->  *)
+     (* ignore liblistpath; *)
+    create_or_get_private_branch repo ip >>= fun private_branch_anchor -> 
     
-    (* let liblist = file_to_liblist liblistpath in *)
+    let liblist = file_to_liblist liblistpath in
     (* refresh repo public_branch_anchor >>= fun () -> *)
-    (* ignore @@ build liblist private_branch_anchor (ip ^ "_private") repo ip; *)
+    ignore @@ build liblist private_branch_anchor (ip ^ "_private") repo ip;
 
     (* ignore @@ publish_to_public repo ip; *)
 
-    ignore @@ squash repo (ip ^ "_private") (ip ^ "_public");
+    (* ignore @@ squash repo (ip ^ "_private") (ip ^ "_public"); *)
 
     Lwt.return_unit 
 
@@ -204,3 +204,8 @@ let buildLibrary ip liblistpath =
 
     (* Scylla_kvStore.Commit.v repo ~info:(Irmin.Info.empty) ~parents:parent_hash_list latest_tree >>= fun new_commit ->  *)
     
+    let _ =
+        let ip = "127.0.0.1" in
+        (*let liblistpath = "/home/shashank/work/benchmark_irminscylla/build_system/input/buildsystem/libreq2" in *)
+    let liblistpath = "./libs" in
+        buildLibrary ip liblistpath
