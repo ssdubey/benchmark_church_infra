@@ -1,0 +1,5 @@
+(executable
+  (name evaluate_log)
+	(libraries digestif.c checkseum.c irmin irmin-unix irmin-containers)
+	(link_flags (-cclib -lstdc++ -cclib -lssl -cclib -lcrypto -cclib -lz))
+	(modules evaluate_log))

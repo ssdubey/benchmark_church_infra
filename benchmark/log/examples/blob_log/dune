@@ -1,0 +1,4 @@
+(executable
+  (name blob_log)
+	(libraries digestif.c checkseum.c irmin irmin-unix irmin-containers)
+	(modules blob_log))
