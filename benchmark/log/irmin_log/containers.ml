@@ -15,7 +15,7 @@ module type S = sig
   val of_branch : repo -> branch -> t Lwt.t
   val clone : src:t -> dst:branch -> t Lwt.t
   (* val get_head : repo -> string -> commit Lwt.t *)
-  (* val branchlist: repo -> branch list Lwt.t *)
+  val list_branches : repo -> branch list Lwt.t
   val merge_into : t -> into:t -> unit Lwt.t
   (* val merge_with_branch : t -> string -> unit Lwt.t *)
   
@@ -51,7 +51,7 @@ end = struct
   let clone ~src ~dst = Store.clone ~src ~dst
 
   (* let get_head repo h = Store.Branch.get repo h *)
-  (* let branchlist repo = Store.Branch.list repo *)
+  let list_branches r = Store.Branch.list r
   
   let merge_into t ~into = 
     Store.merge_into ~info:(Irmin_unix.info "Merging") t ~into >>= function

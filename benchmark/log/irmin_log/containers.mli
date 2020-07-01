@@ -31,9 +31,11 @@ module type S = sig
   val clone : src:t -> dst:branch -> t Lwt.t
     (** Clones the repository *)
 
+  val list_branches : repo -> branch list Lwt.t
   val merge_into : t -> into:t -> unit Lwt.t
     (** Merges one branch into another *)
 
+  
 end
 
 module Make (Backend : Irmin.S_MAKER) 
