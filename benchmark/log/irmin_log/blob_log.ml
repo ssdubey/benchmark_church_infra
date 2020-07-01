@@ -70,10 +70,10 @@ end = struct
 
   let create_entry v = (v, Time.get_time())
 
-  let append t ~path v = 
+  let append t ~path v = print_string "append"; ignore @@ create_entry v;
     Store.find t path >>= function
-    | None -> Store.set_exn ~info:(Irmin_unix.info "creating new log") t path [create_entry v]
-    | Some l -> Store.set_exn ~info:(Irmin_unix.info "adding new entry") t path (create_entry v :: l)
+    | None -> print_string "none";Store.set_exn ~info:(Irmin_unix.info "creating new log") t path [create_entry v]
+    | Some l -> print_string "some";Store.set_exn ~info:(Irmin_unix.info "adding new entry") t path (create_entry v :: l)
 
   let read_all t ~path = 
     Store.find t path >>= function
@@ -85,5 +85,5 @@ module Quick (V : Irmin.Type.S) : sig
   include S with type value = V.t
              and type key = string list
              and type branch = string
-end = Make(Irmin_unix.FS.Make)(Irmin.Metadata.None)(Irmin.Path.String_list)(Irmin.Branch.String)(Irmin.Hash.SHA1)(V)
+end = Make(Irmin_scylla.Make)(Irmin.Metadata.None)(Irmin.Path.String_list)(Irmin.Branch.String)(Irmin.Hash.SHA1)(V)
 

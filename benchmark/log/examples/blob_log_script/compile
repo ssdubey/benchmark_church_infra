@@ -1,0 +1,4 @@
+dune exec ../evaluate_blob_log/blob_log.exe 51.159.31.36 1 10 1
+cqlsh 51.159.31.36 -e "truncate irmin_scylla.atomic_write; truncate irmin_scylla.append_only;"
+rm -f ../blob_log.exe
+cp ../../_build/default/examples/evaluate_blob_log/blob_log.exe .

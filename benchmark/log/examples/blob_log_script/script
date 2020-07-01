@@ -1,0 +1,16 @@
+#!/bin/bash
+no_of_clients=${1}
+log_count=${2}
+replica_count=${3}
+
+#./compile
+#./truncate_script
+
+for ((i=1; i<=${no_of_clients}; i++)) 
+#for ((i=1; i<=3; i++))
+do
+	replica=`expr ${i} % ${replica_count}`
+#dune exec evaluate_log/evaluate_log.exe 51.159.31.36 ${i} ${log_count} ${replica} --root=.&
+./blob_log.exe 51.159.31.36 ${i} ${log_count} ${replica} &
+#dune exec evaluate_log/evaluate_log.exe 51.159.31.36 client1 10 1
+done
