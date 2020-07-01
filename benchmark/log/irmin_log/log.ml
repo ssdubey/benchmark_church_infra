@@ -140,7 +140,7 @@ module Make (Backend : Irmin.S_MAKER) (M : Irmin.Metadata.S) (P : Irmin.Path.S) 
              and type branch = B.t 
 end = struct
   module L = Log_store(C)(K)(V)
-
+  
   module Repo = Containers.Make(Backend)(M)(Type(C)(K)(V))(P)(B)(H)
   include Repo
   
